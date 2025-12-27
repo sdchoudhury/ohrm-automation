@@ -1,0 +1,14 @@
+<suite name="Smoke Suite">
+    <groups>
+        <run>
+            <include name="smoke"/>
+        </run>
+    </groups>
+    <test name="Smoke Tests">
+        <parameter name="browser" value="chrome"/>
+        <classes>
+            <class name="testCases.LoginTest"/>
+        </classes>
+    </test>
+</suite>
+

@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+
+    // Parameters allow you to choose browser and group from Jenkins UI
+    parameters {
+        choice(name: 'BROWSER', choices: ['chrome', 'firefox'], description: 'Choose browser')
+        choice(name: 'TEST_GROUP', choices: ['smoke', 'regression'], description: 'Choose test group to run')
+    }
+
+    environment {
+        MAVEN_HOME = '/usr/local/maven' // Adjust if Maven is installed elsewhere
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from GitHub
+                git branch: 'main', url: 'https://github.com/yourusername/your-repo.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Clean and compile the project
+                sh "${MAVEN_HOME}/bin/mvn clean compile"
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Run tests with TestNG, passing browser and group parameters
+                sh "${MAVEN_HOME}/bin/mvn test -Dsurefire.suiteXmlFiles=testng.xml -Dbrowser=${params.BROWSER} -Dgroups=${params.TEST_GROUP}"
+            }
+        }
+
+        stage('Publish Reports') {
+            steps {
+                // Publish Extent Reports or TestNG reports in Jenkins
+                publishHTML(target: [
+                    reportDir: 'Reports',
+                    reportFiles: 'index.html',
+                    reportName: "TestNG/Extent Report"
+                ])
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up...'
+            sh "${MAVEN_HOME}/bin/mvn clean"
+        }
+        success {
+            echo "Tests passed ✅"
+        }
+        failure {
+            echo "Tests failed ❌"
+        }
+    }
+}
