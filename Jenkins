@@ -15,7 +15,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout code from GitHub
-                git branch: 'main', url: 'https://github.com/yourusername/your-repo.git'
+                git branch: 'develop', url: 'https://github.com/sdchoudhury/ohrm-automation.git'
             }
         }
 
