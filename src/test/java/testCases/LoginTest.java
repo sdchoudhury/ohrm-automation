@@ -1,5 +1,6 @@
 package testCases;
 
+import appSpecific.ScreenshotUtil;
 import appSpecific.Wait;
 import com.aventstack.extentreports.Status;
 import generic.Base;
@@ -7,7 +8,6 @@ import generic.ConfigFileReader;
 import generic.Report;
 import org.testng.Assert;
 import org.testng.ITestResult;
-import org.testng.Reporter;
 import org.testng.annotations.*;
 
 import pages.HomePage;
@@ -20,9 +20,11 @@ public class LoginTest {
 
     // ---------- CONSTANTS ----------
     private static final String EXPECTED_TITLE = "OrangeHRM";
-    private static final String FILE_PATH = "config/config";
+    private static final String FILE_PATH ="config/config";
     private static final String REPORT_PATH =
             System.getProperty("user.dir") + "/reports/";
+    private static final String IMAGE_PATH =
+            System.getProperty("user.dir") + "/screenshots/";
     private static final String EXPECTED_HOME_URL =
             "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index";
     private static final String EXPECTED_INVALID_MSG = "Invalid credentials";
@@ -61,17 +63,27 @@ public class LoginTest {
     @Test(testName = "Login using valid credentials", groups = {"smoke"}, priority = 1)
     public void test_single_user_login() {
         String actualTitle = loginPage.getTitle(Base.getDriver());
-        Assert.assertEquals(actualTitle, EXPECTED_TITLE, "Login page title mismatch");
+        if (!EXPECTED_TITLE.equalsIgnoreCase(actualTitle)) {
+            Report.reportLog(Status.FAIL, "Login page title mismatch. Expected: " + EXPECTED_TITLE + " | Actual: " + actualTitle);
+            Assert.fail("Login page title mismatch");
+        }
         Report.reportLog(Status.INFO, "Entering valid username and password");
         loginPage.loginToApp("admin", "admin123");
         Report.reportLog(Status.INFO, "User waiting for the dashboard to load completely");
         Wait.waitForElementToBeVisible(Base.getDriver(), homePage.getdashBoardLabel(), 30);
         Report.reportLog(Status.INFO, "User waiting for the welcome message to load completely");
         Wait.waitForElementToBeVisible(Base.getDriver(), homePage.getWelcomeMsg(), 30);
-        Assert.assertTrue(homePage.getdashBoardLabel().isDisplayed() && homePage.getWelcomeMsg().isDisplayed(), "Dashboard or Welcome message not visible");
-        Report.reportLog(Status.PASS, "User logged in successfully");
-        Report.reportLog(Status.INFO, "User is now logging out of the application");
-        homePage.logOutFromApp(Base.getDriver(), 30);
+        if (homePage.getdashBoardLabel().isDisplayed() && homePage.getWelcomeMsg().isDisplayed()) {
+            Report.reportLog(Status.PASS,
+                    "User logged in successfully");
+            Report.reportLog(Status.INFO, "User is now logging out of the application");
+            homePage.logOutFromApp(Base.getDriver(), 30);
+
+        } else {
+            Report.reportLog(Status.FAIL,
+                    "Dashboard or Welcome message not visible");
+            Assert.fail("Login validation failed");
+        }
     }
 
     // ---------- TEST 2 ----------
@@ -136,6 +148,7 @@ public class LoginTest {
             }
 
         } catch (IOException e) {
+            Report.reportLog(Status.FAIL,"Failed due to :"+e.getMessage());
             Assert.fail("Error reading test data file", e);
         }
     }
@@ -143,13 +156,27 @@ public class LoginTest {
     // ---------- RESULT LOGGING ----------
     @AfterMethod(alwaysRun = true)
     public void afterMethod(ITestResult result) {
-        if (ITestResult.FAILURE == result.getStatus()) {
-            Report.reportLog(Status.FAIL,
-                    result.getThrowable().getMessage());
-        }
-        Reporter.log("Executed: " + result.getName(), true);
-    }
 
+        if (ITestResult.FAILURE == result.getStatus()) {
+
+            String screenshotPath = ScreenshotUtil.takeScreenshot(
+                    Base.getDriver(),
+                    result.getName()
+            );
+
+            if (screenshotPath != null) {
+                Report.attachScreenshotInReport(
+                        screenshotPath,
+                        "Failure Screenshot"
+                );
+            }
+
+            Report.reportLog(
+                    Status.FAIL,
+                    result.getThrowable().getMessage()
+            );
+        }
+    }
     // ---------- CLEANUP ----------
     @AfterClass(alwaysRun = true)
     public void tearDown() {

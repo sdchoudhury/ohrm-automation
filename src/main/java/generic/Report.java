@@ -61,9 +61,26 @@ public class Report {
     }
 
     // ---------------- SCREENSHOT ----------------
-    public static String attachScreenshotInReport(String screenshotPath) {
-        return logger.addScreenCaptureFromPath(screenshotPath).toString();
+    public static void attachScreenshotInReport(String screenshotPath, String message) {
+
+        if (logger == null) {
+            throw new RuntimeException(
+                    "ExtentTest is null. Did you forget to call Report.startTest()?"
+            );
+        }
+
+        try {
+            logger.log(Status.INFO, message,
+                    MediaEntityBuilder
+                            .createScreenCaptureFromPath(screenshotPath)
+                            .build());
+        } catch (Exception e) {
+            logger.log(Status.WARNING,
+                    "Screenshot attach failed: " + e.getMessage());
+        }
     }
+
+
 
     // ---------------- END REPORT (ONCE PER SUITE) ----------------
     public static void endReport() {

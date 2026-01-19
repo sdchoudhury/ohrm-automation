@@ -1,5 +1,8 @@
 package pages;
 
+import com.aventstack.extentreports.Status;
+import generic.Report;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -29,7 +32,6 @@ public class HomePage {
 	
 	public WebElement getWelcomeMsg() {
 		return welcomeMsg;
-		
 	}
 	
 	public WebElement getdashBoardLabel() {
@@ -38,11 +40,20 @@ public class HomePage {
 	}
 		
 	public void logOutFromApp(WebDriver driver, int waitTime) {
-			Wait.waitForElementToBeClickable(driver,usrNameIcon, waitTime);
-			if(welcomeMsg.isDisplayed()) {
-				usrNameIcon.click();
-				logOutBtn.click();
-			}
+        Report.reportLog(Status.INFO,"Waiting for user icon");
+        Wait.waitForElementToBeClickable(driver, usrNameIcon, waitTime);
+
+        if (!welcomeMsg.isDisplayed()) {
+            throw new NoSuchElementException("Welcome message not displayed");
+        }
+
+        usrNameIcon.click();
+        Report.reportLog(Status.INFO,"Clicked user icon");
+
+        logOutBtn.click();
+        Report.reportLog(Status.INFO,"Clicked logout");
+
+
 			
 	}
 
