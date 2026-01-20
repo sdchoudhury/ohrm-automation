@@ -20,7 +20,10 @@ public class LoginTest {
 
     // ---------- CONSTANTS ----------
     private static final String EXPECTED_TITLE = "OrangeHRM";
-    private static final String FILE_PATH ="config/config";
+    private static final String FILE_PATH =
+            System.getProperty("user.dir") + "/config/config";
+    private static final String USER_DATA =
+            System.getProperty("user.dir") + "/config/users";
     private static final String REPORT_PATH =
             System.getProperty("user.dir") + "/reports/";
     private static final String IMAGE_PATH =
@@ -87,16 +90,14 @@ public class LoginTest {
     }
 
     // ---------- TEST 2 ----------
-    @Test(testName = "Login using multiple users",
-            groups = {"regression"}, priority = 2)
+    @Test(testName = "Login using multiple users", groups = {"regression"}, priority = 2)
     public void test_multiple_users_login() {
 
         String actualTitle = loginPage.getTitle(Base.getDriver());
         Assert.assertEquals(actualTitle, EXPECTED_TITLE,
                 "Login page title mismatch");
 
-        try (BufferedReader br =
-                     new BufferedReader(new FileReader(FILE_PATH))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(USER_DATA))) {
 
             String line;
             int row = 0;
@@ -110,40 +111,20 @@ public class LoginTest {
                 String username = data[0];
                 String password = data[1];
 
-                Report.reportLog(Status.INFO,
-                        "Attempting login with user: " + username);
-
+                Report.reportLog(Status.INFO, "Attempting login with username: " + username);
                 loginPage.loginToApp(username, password);
-
-                String currentUrl =
-                        Base.getDriver().getCurrentUrl();
-
+                String currentUrl = Base.getDriver().getCurrentUrl();
                 if (EXPECTED_HOME_URL.equalsIgnoreCase(currentUrl)) {
 
-                    Report.reportLog(Status.PASS,
-                            "Login successful for user: " + username);
-
+                    Report.reportLog(Status.PASS, "Login successful for username: " + username);
                     homePage.logOutFromApp(Base.getDriver(), 30);
 
                 } else {
-
-                    Wait.waitForElementToBeVisible(
-                            Base.getDriver(),
-                            loginPage.getInvalidCredentialMsg(),
-                            30
-                    );
-
-                    String actualMsg =
-                            loginPage.getInvalidCredentialMsg().getText();
-
-                    Assert.assertEquals(
-                            actualMsg,
-                            EXPECTED_INVALID_MSG,
-                            "Invalid credential message mismatch"
-                    );
-
-                    Report.reportLog(Status.FAIL,
-                            "Login failed for user: " + username);
+                    Report.reportLog(Status.PASS, "Login successful for username : " + username +" not possible");
+                    Wait.waitForElementToBeVisible(Base.getDriver(), loginPage.getInvalidCredentialMsg(), 30);
+                    String actualMsg = loginPage.getInvalidCredentialMsg().getText();
+                    Assert.assertEquals(actualMsg, EXPECTED_INVALID_MSG, "Invalid credential");
+                    Report.reportLog(Status.PASS, "Login failed for user: " + username+" due to "+actualMsg);
                 }
             }
 
