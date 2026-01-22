@@ -1,13 +1,23 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.1.dtd">
 <suite name="Smoke Suite">
-    <groups>
-        <run>
-            <include name="smoke"/>
-        </run>
-    </groups>
+
     <test name="Smoke Tests">
+
+        <!-- Browser parameter -->
         <parameter name="browser" value="chrome"/>
+
+        <!-- Run only smoke group -->
+        <groups>
+            <run>
+                <include name="Smoke Test"/>
+            </run>
+        </groups>
+
+        <!-- Test classes -->
         <classes>
             <class name="testCases.LoginTest"/>
         </classes>
+
     </test>
+
 </suite>
