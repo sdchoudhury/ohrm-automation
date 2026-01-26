@@ -41,9 +41,7 @@ public class LoginTest {
     // ---------- EXTENT REPORT ----------
     @BeforeSuite(alwaysRun = true)
     public void beforeSuite() {
-        Report.startReport(REPORT_PATH,
-                "AutomationReport",
-                "Login Test Suite");
+        Report.startReport(REPORT_PATH, "AutomationReport", "Login Test Suite");
     }
 
     // ---------- DRIVER SETUP ----------
@@ -63,7 +61,7 @@ public class LoginTest {
     }
 
     // ---------- TEST 1 ----------
-    @Test(testName = "Login using valid credentials", groups = {"smoke"}, priority = 1,enabled = false)
+    @Test(testName = "Login using valid credentials", groups = {"Smoke Test"}, priority = 1,enabled = true)
     public void test_single_user_login() {
         String actualTitle = loginPage.getTitle(Base.getDriver());
         if (!EXPECTED_TITLE.equalsIgnoreCase(actualTitle)) {
@@ -90,7 +88,7 @@ public class LoginTest {
     }
 
     // ---------- TEST 2 ----------
-    @Test(testName = "Login using multiple users", groups = {"regression"}, priority = 2,enabled = false)
+    @Test(testName = "Login using multiple users", groups = {"regression","Smoke Test"}, priority = 2,enabled = true)
     public void test_multiple_users_login() {
 
         String actualTitle = loginPage.getTitle(Base.getDriver());
@@ -156,21 +154,21 @@ public class LoginTest {
     @Test(
             testName = "Login DDT using Data Providers",
             dataProvider = "testData",
-            enabled = true,
+            enabled = false,
             groups = {"Regression Test", "Smoke Test"},
             priority = 3
     )
     public void test_using_dataProvider(String usrName, String password) throws IOException {
 
         try{
-            Report.reportLog(Status.INFO, "Attempting login with username: " + usrName);
-            Wait.waitForPageToLoad(Base.getDriver(), 30);
-            loginPage.loginToApp(usrName, password);
-            String currentUrl = Base.getDriver().getCurrentUrl();
-            if (EXPECTED_HOME_URL.equalsIgnoreCase(currentUrl)) {
-                Report.reportLog(Status.PASS, "Login successful for username: " + usrName);
-                homePage.logOutFromApp(Base.getDriver(), 30);
-            } else {
+                Report.reportLog(Status.INFO, "Attempting login with username: " + usrName);
+                Wait.waitForPageToLoad(Base.getDriver(), 30);
+                loginPage.loginToApp(usrName, password);
+                String currentUrl = Base.getDriver().getCurrentUrl();
+                if (EXPECTED_HOME_URL.equalsIgnoreCase(currentUrl)) {
+                    Report.reportLog(Status.PASS, "Login successful for username: " + usrName);
+                    homePage.logOutFromApp(Base.getDriver(), 30);
+                } else {
                 Report.reportLog(Status.PASS, "Login successful for username : " + usrName +" not possible");
                 Wait.waitForElementToBeVisible(Base.getDriver(), loginPage.getInvalidCredentialMsg(), 30);
                 String actualMsg = loginPage.getInvalidCredentialMsg().getText();
