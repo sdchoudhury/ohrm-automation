@@ -1,10 +1,8 @@
 package generic;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.Iterator;
+import java.util.Properties;
 
 public class ConfigFileReader {
 
@@ -31,4 +29,16 @@ public class ConfigFileReader {
 		return value;
 	}
 
+    public static String getProperties(String env, String propertyKey) {
+        String keyVal=null;
+        try {
+            FileInputStream fis = new FileInputStream("src/main/resources/"+env+".properties");
+            Properties prop = new Properties();
+            prop.load(fis);
+            keyVal = prop.getProperty(propertyKey);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return keyVal;
+    }
 }

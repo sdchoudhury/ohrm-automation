@@ -31,8 +31,9 @@ public class LoginTest {
             "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index";
     private static final String EXCEL_PATH =
             System.getProperty("user.dir") + "/test-data/LoginData.xls";
-    private static final String URL =
-            ConfigFileReader.getPropertyValue(FILE_PATH, "webUrl");
+    private static final String environment = System.getProperty("env","qa");
+    //private static final String URL = ConfigFileReader.getPropertyValue(FILE_PATH, "webUrl");
+    private static final String URL = ConfigFileReader.getProperties(environment, "base.url");
 
     // ---------- OBJECTS ----------
     LoginPage loginPage;

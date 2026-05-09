@@ -41,3 +41,5 @@ build/
 reports/
 logs/
 screenshots/
+test/java/testCases/roughtest
+test/java/testCases/WindowHandleExample

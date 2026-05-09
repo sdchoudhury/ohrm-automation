@@ -1,34 +1,62 @@
 package testCases;
 
-import appSpecific.Wait;
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.Status;
-import com.aventstack.extentreports.reporter.ExtentSparkReporter;
-import generic.Base;
-import generic.ConfigFileReader;
-import generic.Report;
-import org.testng.Assert;
-import org.testng.ITestResult;
-import org.testng.Reporter;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 import org.testng.annotations.*;
 import pages.HomePage;
 import pages.LoginPage;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.swing.*;
+import java.time.Duration;
+import java.util.List;
+
 
 public class roughtest {
 
-    private static final String FILE_PATH =System.getProperty("user.dir") + "config/config";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
-        System.out.println(FILE_PATH);
-        String val = ConfigFileReader.getPropertyValue(FILE_PATH, "webUrl");
-        System.out.println(val);
+        WebDriver driver = new ChromeDriver();
+
+        WebDriverWait wait =
+                new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        driver.get("https://demoqa.com/browser-windows");
+
+        driver.manage().window().maximize();
+
+        // Click Widgets
+        WebElement widgets =
+                driver.findElement(By.xpath("//div[text()='Widgets']"));
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        js.executeScript("arguments[0].scrollIntoView(true);", widgets);
+
+        js.executeScript("arguments[0].click();", widgets);
+
+        // Wait and click Select Menu
+        WebElement selectMenu = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.xpath("//span[text()='Select Menu']")
+                )
+        );
+
+        selectMenu.click();
+        WebElement sel = driver.findElement(By.id("react-select-2-placeholder"));
+        Select dropdown = new Select(sel);
+        dropdown.selectByIndex(0);
+        List<WebElement> values = dropdown.getOptions();
+        for (WebElement value : values) {
+            System.out.println(value.getText());
+        }
+        Thread.sleep(2000);
+
+       driver.quit();
     }
 }

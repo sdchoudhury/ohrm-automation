@@ -31,5 +31,4 @@ public class Wait {
         wait.until(ExpectedConditions.titleIs(wbTitle));
 	}
 
-
 }
